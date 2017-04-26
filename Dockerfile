@@ -21,10 +21,10 @@ RUN apk --no-cache --virtual build-dependencies add autoconf \
     chrpath \
     file \
     libevent-dev \
-    openssl \
+    libressl \
     libtool \
     linux-headers \
-    openssl-dev \
+    libressl-dev \
     protobuf-dev \
     zeromq-dev \
   && mkdir -p /tmp/build \
@@ -60,7 +60,7 @@ RUN apk --no-cache --virtual build-dependencies add autoconf \
     boost-program_options \
     libevent \
     libzmq \
-    openssl \
+    libressl \
     su-exec
 
 VOLUME ["/home/bitcoin/.bitcoin"]

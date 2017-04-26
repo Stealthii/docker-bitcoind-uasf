@@ -60,6 +60,7 @@ RUN apk --no-cache --virtual build-dependencies add autoconf \
     boost-program_options \
     libevent \
     libzmq \
+    openssl \
     su-exec
 
 VOLUME ["/home/bitcoin/.bitcoin"]

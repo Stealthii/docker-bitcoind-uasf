@@ -7,7 +7,8 @@ RUN adduser -S bitcoin
 ENV BERKELEYDB_VERSION=db-4.8.30.NC
 ENV BERKELEYDB_PREFIX=/opt/${BERKELEYDB_VERSION}
 
-ENV BITCOIN_VERSION=0.14-BIP148
+ENV BITCOIN_VERSION=0.14.1-uasfsegwit0.3 \
+  BITCOIN_SHASUM="9800a45e2e4a5f998355f59474534703ac1c5d468d10a82ca07777f3d9c3edb5"
 ENV BITCOIN_PREFIX=/opt/bitcoin-${BITCOIN_VERSION} \
   BITCOIN_DATA=/home/bitcoin/.bitcoin
 ENV PATH=${BITCOIN_PREFIX}/bin:$PATH
@@ -33,8 +34,9 @@ RUN apk --no-cache --virtual build-dependencies add autoconf \
   && cd /tmp/build/${BERKELEYDB_VERSION}/build_unix \
   && ../dist/configure --enable-cxx --disable-shared --with-pic --prefix=${BERKELEYDB_PREFIX} \
   && make install \
-  && wget -O /tmp/build/v${BITCOIN_VERSION}.tar.gz https://github.com/UASF/bitcoin/archive/${BITCOIN_VERSION}.tar.gz \
+  && wget -O /tmp/build/v${BITCOIN_VERSION}.tar.gz https://github.com/UASF/bitcoin/archive/v${BITCOIN_VERSION}.tar.gz \
   && cd /tmp/build \
+  && echo "${BITCOIN_SHASUM}  v${BITCOIN_VERSION}.tar.gz" | sha256sum -c \
   && tar -xzf v${BITCOIN_VERSION}.tar.gz \
   && cd /tmp/build/bitcoin-${BITCOIN_VERSION} \
   && ./autogen.sh \

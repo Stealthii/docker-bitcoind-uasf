@@ -4,7 +4,8 @@ MAINTAINER Dan Porter <dpreid@gmail.com>
 
 RUN adduser -S bitcoin
 
-ENV BERKELEYDB_VERSION=db-4.8.30.NC
+ENV BERKELEYDB_VERSION=db-4.8.30.NC \
+  BERKELEYDB_SHASUM="12edc0df75bf9abd7f82f821795bcee50f42cb2e5f76a6a281b85732798364ef"
 ENV BERKELEYDB_PREFIX=/opt/${BERKELEYDB_VERSION}
 
 ENV BITCOIN_VERSION=0.14.1-uasfsegwit0.3 \
@@ -28,16 +29,16 @@ RUN apk --no-cache --virtual build-dependencies add autoconf \
     zeromq-dev \
   && mkdir -p /tmp/build \
   && wget -O /tmp/build/${BERKELEYDB_VERSION}.tar.gz http://download.oracle.com/berkeley-db/${BERKELEYDB_VERSION}.tar.gz \
+  && echo "${BERKELEYDB_SHASUM}  /tmp/build/${BERKELEYDB_VERSION}.tar.gz" | sha256sum -c \
+  && wget -O /tmp/build/v${BITCOIN_VERSION}.tar.gz https://github.com/UASF/bitcoin/archive/v${BITCOIN_VERSION}.tar.gz \
+  && echo "${BITCOIN_SHASUM}  /tmp/build/v${BITCOIN_VERSION}.tar.gz" | sha256sum -c \
   && tar -xzf /tmp/build/${BERKELEYDB_VERSION}.tar.gz -C /tmp/build/ \
   && sed s/__atomic_compare_exchange/__atomic_compare_exchange_db/g -i /tmp/build/${BERKELEYDB_VERSION}/dbinc/atomic.h \
   && mkdir -p ${BERKELEYDB_PREFIX} \
   && cd /tmp/build/${BERKELEYDB_VERSION}/build_unix \
   && ../dist/configure --enable-cxx --disable-shared --with-pic --prefix=${BERKELEYDB_PREFIX} \
   && make install \
-  && wget -O /tmp/build/v${BITCOIN_VERSION}.tar.gz https://github.com/UASF/bitcoin/archive/v${BITCOIN_VERSION}.tar.gz \
-  && cd /tmp/build \
-  && echo "${BITCOIN_SHASUM}  v${BITCOIN_VERSION}.tar.gz" | sha256sum -c \
-  && tar -xzf v${BITCOIN_VERSION}.tar.gz \
+  && tar -xzf /tmp/build/v${BITCOIN_VERSION}.tar.gz -C /tmp/build/ \
   && cd /tmp/build/bitcoin-${BITCOIN_VERSION} \
   && ./autogen.sh \
   && ./configure LDFLAGS=-L${BERKELEYDB_PREFIX}/lib/ CPPFLAGS=-I${BERKELEYDB_PREFIX}/include/ \
